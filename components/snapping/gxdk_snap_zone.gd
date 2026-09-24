@@ -65,6 +65,12 @@ signal released(body)
 ## Optional, object to snap must not belong to this group
 @export var exclude_group: String
 
+## Optional, snap point to snap must be part of this group
+@export var require_snap_point_group: String
+
+## Optional, snap point to snap must not belong to this group
+@export var exclude_snap_point_group: String
+
 ## We only snap objects belonging to these physics layers
 @export_flags_3d_physics var detection_mask: int = 1
 #endregion
@@ -348,6 +354,16 @@ func _physics_process(delta):
 	if snap_point:
 		closest_point = snap_point.global_position
 		offset_transform = snap_point.transform
+
+		# Is closest body in the required group?
+		if require_snap_point_group and not snap_point.is_in_group(require_snap_point_group):
+			_clear_closest_body()
+			return
+
+		# Is closest body not in the excluded group?
+		if exclude_snap_point_group and snap_point.is_in_group(exclude_snap_point_group):
+			_clear_closest_body()
+			return
 	else:
 		offset_transform.basis.y = -result.normal.normalized()
 		offset_transform.basis.x = global_basis.z.cross(offset_transform.basis.y).normalized()
