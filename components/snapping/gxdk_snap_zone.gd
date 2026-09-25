@@ -369,16 +369,22 @@ func _physics_process(delta):
 		closest_point = snap_point.global_position
 		offset_transform = snap_point.transform
 
-		# Is closest body in the required group?
+		# Is our snap point in the required group?
 		if require_snap_point_group and not snap_point.is_in_group(require_snap_point_group):
 			_clear_closest_body()
 			return
 
-		# Is closest body not in the excluded group?
+		# Is our snap point not in the excluded group?
 		if exclude_snap_point_group and snap_point.is_in_group(exclude_snap_point_group):
 			_clear_closest_body()
 			return
 	else:
+		# If we don't have a snap point, we can't require a snap point group. 
+		if require_snap_point_group:
+			_clear_closest_body()
+			return
+
+		# Calculate our offset based on our collision
 		offset_transform.basis.y = -result.normal.normalized()
 		offset_transform.basis.x = global_basis.z.cross(offset_transform.basis.y).normalized()
 		offset_transform.basis.z = offset_transform.basis.x.cross(offset_transform.basis.y).normalized()
