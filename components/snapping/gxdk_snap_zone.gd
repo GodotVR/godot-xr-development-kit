@@ -136,6 +136,11 @@ func get_closest_offset(global: bool = true):
 		return _closest_offset
 
 
+# Return the node we've captured!
+func get_captured_node() -> PhysicsBody3D:
+	return _captured_body
+
+
 ## Capture this node
 func capture_node(body: PhysicsBody3D, offset: Transform3D = Transform3D()):
 	if not enabled:
@@ -175,6 +180,10 @@ func capture_node(body: PhysicsBody3D, offset: Transform3D = Transform3D()):
 
 	set_process(true)
 
+	# Let object know that we captured it
+	if _captured_body.has_method("captured"):
+		_captured_body.captured(self)
+
 	captured.emit(_captured_body)
 
 ## Release our current captured node
@@ -204,6 +213,11 @@ func release_captured_body():
 	_captured_body = null
 
 	set_process(false)
+
+	# Let object know that we released it
+	if was_captured.has_method("released"):
+		was_captured.released(self)
+
 
 	released.emit(was_captured)
 #endregion
